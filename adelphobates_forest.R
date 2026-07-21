@@ -167,8 +167,8 @@ br_states = st_read("estados_BR/BR_UF_2024.shp") %>%
 
 ggplot() +
   geom_sf(data = br_states, size = 1, fill = "NA") +
-  geom_sf(data = tabela_landuse_forest_sf, color = "black", shape = 20, size = 3) +
-  geom_sf(data = tabela_landuse_forest_sf, aes(color = morfotipo), shape = 20, size = 2) +
+  geom_sf(data = tabela_landuse_forest_sf, color = "black", shape = 20, size = 3.4) +
+  geom_sf(data = tabela_landuse_forest_sf, aes(color = morfotipo), shape = 20, size = 3) +
   scale_color_manual(values = frog_colors, name = "Morphotype") +
   theme_classic()
 
