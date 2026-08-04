@@ -17,6 +17,7 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 ## carregar tabela
 tabela_landuse = read.csv("tabela_completa.csv", sep = ";") %>% 
   dplyr::mutate(
+    morfotipo = trimws(morfotipo),
     latitude = as.numeric(gsub(",", ".",latitude)),
     longitude = as.numeric(gsub(",", ".",longitude))) %>% 
   dplyr::distinct(latitude, longitude, .keep_all = T) 
@@ -26,8 +27,8 @@ table(tabela_landuse$morfotipo)
 
 # filtrar só floresta e transformar a tabela noutro formato
 tabela_landuse_forest = tabela_landuse %>% 
-  dplyr::select(ID, morfotipo, starts_with("X3.Forest")) %>% # selecionar só colunas com "Forest"
-  pivot_longer(cols = starts_with("X3.Forest"),
+  dplyr::select(ID, morfotipo, starts_with("X3.Forest_")) %>% # selecionar só colunas com "Forest"
+  pivot_longer(cols = starts_with("X3.Forest_"),
                names_to = "Year",
                values_to = "Forest_Cover",
                names_pattern = "Forest_(\\d+)") %>% 
@@ -66,11 +67,12 @@ ggplot(tabela_landuse_forest, aes(x = Year, y = Forest_Cover,color = as.factor(m
   # geom_smooth(se = F, method = "glm", size = 2.2, aes(alpha = .4)) +
   scale_color_manual(values = frog_colors, name = "Morphotype") +
   theme_classic() +
-  theme(axis.text.x = element_text(size = 14),
-        axis.text.y = element_text(size = 14),
-        axis.title.x = element_text(size = 18),
-        axis.title.y = element_text(size = 18)
+  theme(axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12),
+        axis.title.x = element_text(size = 15),
+        axis.title.y = element_text(size = 15)
   ) +
+  coord_cartesian(ylim = c(1000, 3300))+
   labs(x = "Year",
        y = "Forest cover (nr of pixels)")
 
@@ -137,8 +139,8 @@ df_slopes_results = as.data.frame(frog_slopes)
 ggplot(df_slopes_results, aes(x = reorder(morfotipo, Year.trend), y = Year.trend, 
                               color = morfotipo)) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
-  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0.3, size = 1.5) +
-  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0.3, size = 1.2) +
+  geom_point(size = 2.5) +
   scale_color_manual(values = frog_colors) +
   coord_flip() +
   theme_classic() +
@@ -149,8 +151,8 @@ ggplot(df_slopes_results, aes(x = reorder(morfotipo, Year.trend), y = Year.trend
   theme(legend.position = "none",
         axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12),
-        axis.title.x = element_text(size = 18),
-        axis.title.y = element_text(size = 18)
+        axis.title.x = element_text(size = 15),
+        axis.title.y = element_text(size = 15)
   ) 
 
 
@@ -166,11 +168,32 @@ br_states = st_read("estados_BR/BR_UF_2024.shp") %>%
   
 
 ggplot() +
-  geom_sf(data = br_states, size = 1, fill = "NA") +
-  geom_sf(data = tabela_landuse_forest_sf, color = "black", shape = 20, size = 3.4) +
-  geom_sf(data = tabela_landuse_forest_sf, aes(color = morfotipo), shape = 20, size = 3) +
-  scale_color_manual(values = frog_colors, name = "Morphotype") +
-  theme_classic()
-
+  geom_sf(
+    data = br_states,
+    linewidth = 0.4,
+    fill = "white",
+    color = "grey40"
+  ) +
+  geom_sf(
+    data = tabela_landuse_forest_sf,
+    aes(fill = morfotipo),
+    shape = 21,
+    size = 3,
+    color = "black",
+    stroke = 0.4,
+    alpha = 0.85
+  ) +
+  scale_fill_manual(
+    values = frog_colors,
+    name = "Morphotype"
+  ) +
+  coord_sf(expand = FALSE) +
+  theme_classic() +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10),
+    axis.title = element_blank()
+  )
 
 
