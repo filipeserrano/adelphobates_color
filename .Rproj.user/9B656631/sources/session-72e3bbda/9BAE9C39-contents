@@ -155,6 +155,7 @@ ggplot(df_slopes_results, aes(x = reorder(morfotipo, Year.trend), y = Year.trend
         axis.title.y = element_text(size = 15)
   ) 
 
+# fazemos o mapa #
 
 tabela_landuse_forest_sf = tabela_landuse_forest %>% 
   distinct(ID, .keep_all = T) %>% 
@@ -165,8 +166,28 @@ mapView(tabela_landuse_forest_sf, z = "morfotipo")
 
 br_states = st_read("estados_BR/BR_UF_2024.shp") %>% 
   dplyr::filter(NM_REGIA == "Norte" | SIGLA_UF %in% c("MA", "MT"))
-  
 
+amazonia_legal <- st_read("Limites_Amazonia_Legal_2024_shp/Limites_Amazonia_Legal_2024.shp")
+amazonia_legal <- st_transform(amazonia_legal, 4326)
+
+names(br_states)
+br_states <- br_states [, c("SIGLA_UF", "geometry")]
+centroides_estados <- st_centroid(br_states)
+
+sigla_states <- br_states %>%
+  st_point_on_surface() %>%
+  mutate(
+    x= st_coordinates(.)[,1],
+    y= st_coordinates(.)[,2]
+  ) %>%
+  st_drop_geometry()
+
+sigla_states <- sigla_states %>%
+ mutate(
+   x = ifelse(SIGLA_UF == "AC", x + 0.1, x),
+   y = ifelse(SIGLA_UF == "AC", y + 0.3, y)
+   )
+ 
 ggplot() +
   geom_sf(
     data = br_states,
@@ -175,19 +196,32 @@ ggplot() +
     color = "grey40"
   ) +
   geom_sf(
+    data = amazonia_legal,
+    linewidth = 0.82,
+    fill = NA,
+    color = "darkred"
+   )+
+  geom_sf(
     data = tabela_landuse_forest_sf,
     aes(fill = morfotipo),
     shape = 21,
-    size = 3,
+    size = 3.6,
     color = "black",
-    stroke = 0.4,
-    alpha = 0.85
+    stroke = 0.32,
+    alpha = 0.62
+  ) +
+  geom_text(
+    data = sigla_states,
+    aes(x = x, y=y, label=SIGLA_UF),
+    size = 3.2,
+    fontface = "bold",
+    color = "black"
   ) +
   scale_fill_manual(
     values = frog_colors,
     name = "Morphotype"
   ) +
-  coord_sf(expand = FALSE) +
+  coord_sf(expand = TRUE) +
   theme_classic() +
   theme(
     legend.position = "right",
@@ -195,5 +229,4 @@ ggplot() +
     legend.text = element_text(size = 10),
     axis.title = element_blank()
   )
-
 
