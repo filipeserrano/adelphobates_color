@@ -128,6 +128,7 @@ AIC(lme_spatial0, lme_spatial1, lme_spatial2, lme_spatial3,lme_spatial_full )
 summary(lme_spatial_full)
 
 library(emmeans)
+library(rnaturalearth)
 frog_slopes = emtrends(lme_spatial_full, 
                        specs = ~ morfotipo, 
                        var = "Year")
@@ -164,8 +165,8 @@ tabela_landuse_forest_sf = tabela_landuse_forest %>%
 mapView(tabela_landuse_forest_sf, z = "morfotipo")
 
 
-br_states = st_read("estados_BR/BR_UF_2024.shp") %>% 
-  dplyr::filter(NM_REGIA == "Norte" | SIGLA_UF %in% c("MA", "MT"))
+br_states = st_read("estados_BR/BR_UF_2024.shp")
+latina_america = st_read("Lim_america_do_sul_IBGE_2021/Lim_america_do_sul_2021.shp")
 
 amazonia_legal <- st_read("Limites_Amazonia_Legal_2024_shp/Limites_Amazonia_Legal_2024.shp")
 amazonia_legal <- st_transform(amazonia_legal, 4326)
@@ -190,6 +191,12 @@ sigla_states <- sigla_states %>%
  
 ggplot() +
   geom_sf(
+    data = latina_america,
+    linewidth = 0.4,
+    fill = "white",
+    color = "grey40"
+  ) +
+  geom_sf(
     data = br_states,
     linewidth = 0.4,
     fill = "white",
@@ -197,7 +204,7 @@ ggplot() +
   ) +
   geom_sf(
     data = amazonia_legal,
-    linewidth = 0.82,
+    linewidth = 0.84,
     fill = NA,
     color = "darkred"
    )+
@@ -211,7 +218,8 @@ ggplot() +
     alpha = 0.62
   ) +
   geom_text(
-    data = sigla_states,
+    data = sigla_states%>%
+      dplyr::filter(SIGLA_UF %in% c("AM", "PA", "RO", "AC", "RR", "AP", "TO", "MA", "MT")),
     aes(x = x, y=y, label=SIGLA_UF),
     size = 3.2,
     fontface = "bold",
@@ -221,7 +229,11 @@ ggplot() +
     values = frog_colors,
     name = "Morphotype"
   ) +
-  coord_sf(expand = FALSE) +
+  coord_sf(
+    expand = TRUE,
+    xlim = c(-58, -44),
+    ylim = c(-13, 6),
+  ) +
   theme_classic() +
   theme(
     legend.position = "right",
