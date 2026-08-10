@@ -3,24 +3,24 @@
     "path": "~/GitHub/adelphobates_color/adelphobates_forest.R",
     "project_path": "adelphobates_forest.R",
     "type": "r_source",
-    "hash": "4229017062",
+    "hash": "0",
     "contents": "",
-    "dirty": false,
+    "dirty": true,
     "created": 1785869855810.0,
     "source_on_save": false,
     "relative_order": 2,
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "223,4",
-        "scrollLine": "223"
+        "cursorPosition": "274,0",
+        "scrollLine": "254"
     },
     "folds": "",
     "lastKnownWriteTime": 1786401794,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1786401794200,
+    "last_content_update": 1786405009053,
     "read_only": false,
     "read_only_alternatives": []
 }

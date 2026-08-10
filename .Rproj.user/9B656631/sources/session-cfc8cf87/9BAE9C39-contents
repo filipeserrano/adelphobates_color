@@ -129,6 +129,7 @@ summary(lme_spatial_full)
 
 library(emmeans)
 library(rnaturalearth)
+library(patchwork)
 frog_slopes = emtrends(lme_spatial_full, 
                        specs = ~ morfotipo, 
                        var = "Year")
@@ -189,7 +190,7 @@ sigla_states <- sigla_states %>%
    y = ifelse(SIGLA_UF == "AC", y + 0.3, y)
    )
  
-ggplot() +
+mapa_central <- ggplot() +
   geom_sf(
     data = latina_america,
     linewidth = 0.4,
@@ -232,7 +233,7 @@ ggplot() +
   coord_sf(
     expand = TRUE,
     xlim = c(-58, -44),
-    ylim = c(-13, 6),
+    ylim = c(-13, 6)
   ) +
   theme_classic() +
   theme(
@@ -242,3 +243,32 @@ ggplot() +
     axis.title = element_blank()
   )
 
+mapa_total <- ggplot()+
+  geom_sf(
+    data = latina_america,
+    fill= "white",
+    color = "black",
+    linewidth = 0.27
+  )+
+  geom_rect(
+    aes(
+      xmin= -58,
+      xmax= -44,
+      ymin= -13,
+      ymax = 6
+    ),
+    fill = NA,
+    color = "red3",
+    linewidth = 0.6
+  )+
+  theme_void()
+
+mapa_final <- mapa_central+
+  inset_element(
+    mapa_total,
+    left = 0.02,
+    bottom = 0.72,
+    right = 1.7,
+    top= 0.95
+  )
+mapa_final
