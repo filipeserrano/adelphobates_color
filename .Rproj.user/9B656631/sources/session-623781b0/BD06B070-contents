@@ -49,6 +49,7 @@ tabela_landuse_forest = tabela_landuse %>%
                names_pattern = "Forest_(\\d+)") %>% 
   dplyr::filter(morfotipo != "wine") 
 
+
 frog_colors = c(
   "orange" = "orange",
   "red" = "red3",
